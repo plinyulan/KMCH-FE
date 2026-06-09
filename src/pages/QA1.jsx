@@ -6,6 +6,7 @@ function QA1() {
 
   const handleAnswer = (score) => {
     localStorage.setItem("transferScore", score);
+    localStorage.setItem("qa1Answer", score === 1 ? "yes" : "no");
     navigate("/QA2");
   };
 

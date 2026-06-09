@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Statepath.css";
 
@@ -8,6 +9,7 @@ import doctorImg from "../image/seedoctor.png";
 import mentalImg from "../image/mantal.png";
 import transferImg from "../image/transfer.png";
 import xrayImg from "../image/x-ray.png";
+import { apiGet, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function StatePath() {
   const navigate = useNavigate();
@@ -25,6 +27,33 @@ function StatePath() {
   const noNeedTransfer = qa1 === 1 || qa2 === 1;
   const needAskTransfer = qa1 !== 1 && qa2 !== 1;
 
+  // mental-check from backend: needs mental station only when the patient
+  // hasn't completed the screening form (not in the Excel). The is_sv flag is
+  // currently sourced from the same Excel as psyeval_form, so it would always
+  // duplicate the result — ignore it until a separate "severe" file is wired.
+  const [needsMental, setNeedsMental] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const lineId = await getLineId();
+      if (!lineId) return;
+      try {
+        const data = await apiGet(
+          `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
+        );
+        if (!cancelled && data?.psyeval_form === false) {
+          setNeedsMental(true);
+        }
+      } catch {
+        // not registered / network error — leave needsMental as false
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   let pathType = "NORMAL";
 
   if (userData.isWalkIn) {
@@ -37,6 +66,12 @@ function StatePath() {
     pathType = "MENTAL";
   } else if (noNeedTransfer) {
     pathType = "NORMAL";
+  }
+
+  // Override from backend check: MENTAL station required.
+  // If transfer is also required, upgrade NORMAL→MENTAL and TRANSFER→MENTAL_TRANSFER.
+  if (needsMental) {
+    pathType = pathType === "TRANSFER" ? "MENTAL_TRANSFER" : "MENTAL";
   }
 
   const pathMap = {

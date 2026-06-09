@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import "./Queue.css";
 import image from "../image/queue.png";
+import { apiGet, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function Queue() {
   const [queueData, setQueueData] = useState({
     queueCount: 0,
-    queueNo: "0129",
-    name: "Pathumwadee DA",
-    room: "ห้องตรวจที่ 1",
+    queueNo: "-",
+    name: "",
+    room: "",
     status: "waiting",
   });
 
@@ -15,14 +16,20 @@ function Queue() {
 
   const fetchQueue = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/queue");
-      const data = await res.json();
+      const lineId = await getLineId();
+      if (!lineId) {
+        console.warn("no line id yet — skipping queue fetch");
+        return;
+      }
+      const data = await apiGet(
+        `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`
+      );
 
       setQueueData({
-        queueCount: data.queueCount ?? 0,
-        queueNo: data.queueNo ?? "0129",
-        name: data.name ?? "Pathumwadee DA",
-        room: data.room ?? "ห้องตรวจที่ 1",
+        queueCount: data.ahead ?? data.total_waiting ?? 0,
+        queueNo: data.queue_no ?? "-",
+        name: data.name ?? "",
+        room: data.room_name ?? "",
         status: data.status ?? "waiting",
       });
     } catch (error) {

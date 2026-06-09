@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
+import { apiGet, apiPost, getLineId, setLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -14,8 +15,9 @@ function Register() {
   });
 
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -70,19 +72,57 @@ function Register() {
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      if (hasNationalId) {
-        navigate("/QA1");
-      } else {
-        const mentalDone =
-          localStorage.getItem("mentalTestDone") === "true";
+    if (Object.keys(newErrors).length !== 0) return;
 
-        if (mentalDone) {
-          navigate("/QA1");
-        } else {
-          navigate("/mental-test-warning");
-        }
-      }
+    const idValue = hasNationalId ? form.citizenId : form.passportId;
+
+    // Outside LINE (web/dev) LIFF isn't initialized, so synthesize a stable
+    // line_id from the user's ID so the backend has something to key on.
+    let lineId = await getLineId();
+    if (!lineId) {
+      lineId = `dev-${idValue}`;
+      setLineId(lineId);
+    }
+
+    const body = {
+      line_id: lineId,
+      first_name: form.firstName.trim(),
+      last_name: form.lastName.trim(),
+      tel_no: form.phone.trim(),
+      id: idValue,
+      event_id: DEFAULT_EVENT_ID,
+    };
+
+    try {
+      setSubmitting(true);
+      const resp = await apiPost("/register", body);
+      localStorage.setItem("registerResponse", JSON.stringify(resp));
+    } catch (err) {
+      setErrors({ submit: err.message || "ลงทะเบียนไม่สำเร็จ" });
+      return;
+    } finally {
+      setSubmitting(false);
+    }
+
+    // If the patient is already in the mental-health Excel (psyeval_form=true),
+    // skip the /mental-test-warning page in every branch below.
+    let psyevalForm = false;
+    try {
+      const check = await apiGet(
+        `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
+      );
+      psyevalForm = check?.psyeval_form === true;
+    } catch {
+      // safe default: leave psyevalForm=false so warning still shows
+    }
+
+    if (hasNationalId) {
+      navigate("/QA1");
+    } else if (psyevalForm) {
+      navigate("/QA1");
+    } else {
+      const mentalDone = localStorage.getItem("mentalTestDone") === "true";
+      navigate(mentalDone ? "/QA1" : "/mental-test-warning");
     }
   };
 
@@ -205,9 +245,11 @@ function Register() {
           )}
         </div>
 
-        <button type="submit">
-          Complete
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Submitting..." : "Complete"}
         </button>
+
+        {errors.submit && <p>{errors.submit}</p>}
       </form>
     </div>
   );

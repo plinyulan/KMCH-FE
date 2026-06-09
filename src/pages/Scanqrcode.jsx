@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import liff from "@line/liff";
 import "./Scanqrcode.css";
+import { apiPost, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function Scanqrcode() {
   const navigate = useNavigate();
@@ -12,49 +13,64 @@ function Scanqrcode() {
   const [debugText, setDebugText] = useState("");
 
   useEffect(() => {
-    const initLiff = async () => {
-      try {
-        setDebugText("กำลังเริ่มต้น LIFF...");
+    // Surface state immediately so we can see what's going on even before
+    // liff.ready resolves.
+    const baseInfo = () =>
+      `LIFF_ID: ${import.meta.env.VITE_LIFF_ID || "(empty)"}\n` +
+      `URL: ${window.location.href}\n` +
+      `liff loaded: ${typeof liff === "object"}\n` +
+      `liff.ready: ${liff.ready ? "exists" : "missing"}`;
 
-        await liff.init({
-          liffId: "2010319350-6qXV1rha",
-        });
+    setDebugText(`waiting for LIFF...\n${baseInfo()}`);
 
-        const info = `
-LIFF INIT SUCCESS
-URL: ${window.location.href}
-isInClient: ${liff.isInClient()}
-scanCodeV2: ${liff.isApiAvailable("scanCodeV2")}
-`;
-
-        console.log(info);
-        setDebugText(info);
-        setLiffReady(true);
-      } catch (err) {
-        console.error("LIFF ERROR:", err);
-
-        const errorMessage = `
-LIFF INIT ERROR
-
-message: ${err?.message || "no message"}
-code: ${err?.code || "no code"}
-
-url: ${window.location.href}
-`;
-
-        setDebugText(errorMessage);
-        alert(errorMessage);
-      }
+    const onReady = () => {
+      const info =
+        `LIFF READY\n` +
+        baseInfo() +
+        `\nisInClient: ${liff.isInClient?.() ?? "unknown"}` +
+        `\nscanCodeV2 available: ${liff.isApiAvailable?.("scanCodeV2") ?? "unknown"}`;
+      console.log(info);
+      setDebugText(info);
+      setLiffReady(true);
     };
 
-    initLiff();
+    if (liff?.ready) {
+      liff.ready.then(onReady).catch((err) => {
+        const msg =
+          `LIFF init failed\n` +
+          baseInfo() +
+          `\nmessage: ${err?.message || "no message"}` +
+          `\ncode: ${err?.code || "no code"}`;
+        console.error(msg);
+        setDebugText(msg);
+      });
+    } else {
+      // No liff.ready at all — init was never called.
+      setDebugText(`LIFF.ready missing — init not called\n${baseInfo()}`);
+    }
   }, []);
 
-  const updateQueue = async (data) => {
-    console.log("ส่งข้อมูลไปหลังบ้าน:", data);
+  const callBackend = async (action) => {
+    const lineId = await getLineId();
+    if (!lineId) throw new Error("ยังไม่มี LINE ID — กรุณาลงทะเบียนก่อน");
 
-    // ใช้ตอนยังไม่มี backend จริง
-    return true;
+    const base = `/patients/${encodeURIComponent(lineId)}`;
+    const eventBody = { event_id: DEFAULT_EVENT_ID };
+
+    if (action === "scan_after_payment") {
+      const needsTransfer = localStorage.getItem("transferConfirm") === "true";
+      return apiPost(`${base}/scan-after-payment`, {
+        ...eventBody,
+        needs_transfer: needsTransfer,
+      });
+    }
+    if (action === "join_doctor_queue") {
+      return apiPost(`${base}/scan-doctor-queue`, eventBody);
+    }
+    if (action === "complete_consultation") {
+      return apiPost(`${base}/complete-doctor-consultation`, eventBody);
+    }
+    return null;
   };
 
   const handleScanQR = async () => {
@@ -71,8 +87,8 @@ url: ${window.location.href}
 
       if (!isLineClient) {
         const mockQR = window.prompt(
-          "ตอนนี้ไม่ได้เปิดใน LINE\nใส่ค่า QR เพื่อทดสอบ\n\nตัวอย่าง:\nROUTE:XRAY\nQUEUE:REGIS_01\nCHECKOUT:REGIS_01\nDOCTOR:DOCTOR_01\nhttps://q.me-qr.com/dz84y86y",
-          "https://q.me-qr.com/dz84y86y"
+          "ตอนนี้ไม่ได้เปิดใน LINE\nใส่ค่า QR เพื่อทดสอบ\n\nตัวอย่าง:\nROUTE:XRAY\nQUEUE:REGIS_01\nCHECKOUT:REGIS_01\nDOCTOR:DOCTOR_01",
+          "QUEUE:REGIS_01",
         );
 
         if (!mockQR) return;
@@ -81,7 +97,7 @@ url: ${window.location.href}
       } else {
         if (!canScan) {
           alert(
-            "LIFF นี้ยังใช้ scanCodeV2 ไม่ได้\n\nให้เช็กใน LINE Developers:\n1. Size ต้องเป็น Full\n2. Scan QR ต้องเป็น ON"
+            "LIFF นี้ยังใช้ scanCodeV2 ไม่ได้\n\nให้เช็กใน LINE Developers:\n1. Size ต้องเป็น Full\n2. Scan QR ต้องเป็น ON",
           );
           return;
         }
@@ -100,10 +116,7 @@ url: ${window.location.href}
       console.log("QR VALUE:", qrValue);
 
       // กรณี QR เป็น URL เช่น https://q.me-qr.com/xxxx
-      if (
-        qrValue.startsWith("http://") ||
-        qrValue.startsWith("https://")
-      ) {
+      if (qrValue.startsWith("http://") || qrValue.startsWith("https://")) {
         // แบบที่ 1: ให้เปิด URL ที่สแกนได้
         window.location.href = qrValue;
 
@@ -130,38 +143,23 @@ url: ${window.location.href}
       }
 
       if (type === "QUEUE") {
-        await updateQueue({
-          stationId: value,
-          action: "join_queue",
-          status: "waiting",
-        });
-
+        await callBackend("join_doctor_queue");
         alert("รับคิวเรียบร้อยแล้ว");
         navigate("/queue");
         return;
       }
 
       if (type === "CHECKOUT") {
-        await updateQueue({
-          stationId: value,
-          action: "leave_queue",
-          status: "completed",
-        });
-
-        alert("ออกจากคิวเรียบร้อยแล้ว");
-        navigate("/");
+        await callBackend("scan_after_payment");
+        alert("ชำระเงินสำเร็จ กำลังเปิดเส้นทาง");
+        navigate("/state-path");
         return;
       }
 
       if (type === "DOCTOR") {
-        await updateQueue({
-          stationId: value,
-          action: "go_doctor",
-          status: "waiting_doctor",
-        });
-
-        alert("ส่งไปพบแพทย์เรียบร้อยแล้ว");
-        navigate("/wait");
+        await callBackend("complete_consultation");
+        alert("จบการพบแพทย์ ไปสถานีถัดไป");
+        navigate("/finish");
         return;
       }
 
@@ -172,7 +170,7 @@ url: ${window.location.href}
       alert(
         `สแกนไม่สำเร็จ\n\nmessage: ${
           err?.message || "no message"
-        }\ncode: ${err?.code || "no code"}`
+        }\ncode: ${err?.code || "no code"}`,
       );
     } finally {
       setLoading(false);
