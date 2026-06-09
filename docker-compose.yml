@@ -3,5 +3,17 @@ services:
     build: .
     container_name: kmch_web
     ports:
-      - "80:80"
+      - "80:80"      # required by Let's Encrypt HTTP-01 challenge
+      - "443:443"
+    environment:
+      # Required. Email Let's Encrypt uses for expiry reminders / recovery.
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      # Pass FQDN through to the nginx config template.
+      FQDN: ${FQDN}
+    volumes:
+      # Persist certs across container recreations.
+      - letsencrypt:/etc/letsencrypt
     restart: unless-stopped
+
+volumes:
+  letsencrypt:
