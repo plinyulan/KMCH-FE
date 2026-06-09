@@ -6,11 +6,8 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2 — nginx with embedded certbot (auto-issues + renews Let's Encrypt)
-FROM jonasal/nginx-certbot:5
-# Put the config under templates/ so the image runs envsubst on it at startup,
-# expanding ${FQDN} into the real hostname before certbot reads it.
-# Output lands at /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+# Stage 2 — plain nginx serving the static SPA. TLS terminates at the ALB.
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80 443
+EXPOSE 80
