@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+.transfer-confirm-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.transfer-confirm-card {
+  width: 393px;
+  min-height: 852px;
+  padding-top: 300px;
+  text-align: center;
+}
+
+.transfer-confirm-title {
+  color: #477591;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 40px;
+}
+
+.transfer-confirm-desc {
+  color: #ff7900;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 100px;
+}
+
+.transfer-confirm-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 90px;
+}
+
+.transfer-confirm-btn {
+  width: 90px;
+  height: 42px;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.transfer-confirm-btn.yes {
+  border: 2px solid #55ad70;
+  color: #00a640;
+}
+
+.transfer-confirm-btn.no {
+  border: 2px solid #ff4b55;
+  color: #ff4b55;
+}
+
+.transfer-confirm-btn:hover {
+  transform: scale(1.05);
+}

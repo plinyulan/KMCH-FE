@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@500;600;700&display=swap");
+
+.advice-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+}
+
+.advice-card {
+  width: 393px;
+  min-height: 852px;
+  background: #ffffff;
+  font-family: "Noto Sans Thai", sans-serif;
+  padding-top: 76px;
+}
+
+.advice-card * {
+  box-sizing: border-box;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.advice-title {
+  margin: 0;
+  padding: 0 33px;
+  color: #ff7800;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.04em;
+}
+
+
+.advice-text {
+  margin: 0;
+  padding: 0 34px;
+  color: #425470;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.72;
+  letter-spacing: -0.055em;
+}
+
+.advice-orange {
+  margin-top: 28px;
+  color: #ff7800;
+}
+.advice-finish-btn {
+  display: block;
+  width:140px;
+  height: 45px;
+  margin: 80px auto 0;
+  border: none;
+  border-radius: 999px;
+  background: #ff7800;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  font-family: "Noto Sans Thai", sans-serif;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.advice-finish-btn:hover {
+  opacity: 0.9;
+}
+
+.advice-finish-btn:active {
+  transform: scale(0.98);
+}

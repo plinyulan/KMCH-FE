@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #d9d9d9;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-page {
+  width: 100%;
+  max-width: 393px;
+  min-height: 852px;
+
+  background: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 40px 20px 60px;
+  gap: 70px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px; /* ระยะรูปกับปุ่มเท่ากันทุกอัน */
+}
+
+.menu-item img {
+  width: 240px;
+  height: 240px; /* บังคับให้สูงเท่ากัน */
+  object-fit: contain;
+}
+
+.btn-orange,
+.btn-blue {
+  background: #ffffff;
+
+  border-radius: 999px;
+
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+
+  padding: 8px 32px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.btn-orange {
+  border: 2px solid #ff7800;
+  color: #ff7800;
+}
+
+.btn-orange:hover {
+  background: #ff7800;
+  color: white;
+}
+
+.btn-blue {
+  border: 2px solid #405574;
+  color: #405574;
+}
+
+.btn-blue:hover {
+  background: #405574;
+  color: white;
+}
+
+/* Responsive สำหรับมือถือ */
+
+@media (max-width: 393px) {
+  .menu-page {
+    width: 100%;
+    padding: 30px 15px 50px;
+  }
+
+  .menu-item img {
+    width: 220px;
+    height: 220px;
+  }
+
+  .btn-orange,
+  .btn-blue {
+    font-size: 22px;
+    padding: 8px 28px;
+  }
+}

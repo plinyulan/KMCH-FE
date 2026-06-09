@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+.transfer-q1-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+}
+
+.transfer-q1-card {
+  width: 393px;
+  min-height: 852px;
+  padding: 35px 39px 60px;
+  background: #ffffff;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.transfer-q1-card * {
+  box-sizing: border-box;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.transfer-q1-title {
+  color: #ff7800;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.transfer-q1-subtitle {
+  width: 306px;
+  margin-top: 0;
+  color: #8cafc3;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.transfer-q1-stepper {
+  width: 241px;
+  margin: 42px auto 0;
+  display: flex;
+  align-items: center;
+}
+
+.transfer-q1-step {
+  font-size: 12px;
+  font-weight: 500;
+  color: #c6c6c8;
+}
+
+.transfer-q1-step.active {
+  color: #ff751f;
+}
+
+.transfer-q1-line {
+  width: 96px;
+  height: 2px;
+  background: #d9d9d9;
+  border-radius: 30px;
+  margin: 0 10px;
+}
+
+.transfer-q1-question {
+  width: 306px;
+  margin-top: 40px;
+  color: #405574;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+.transfer-q1-note {
+  width: 306px;
+  margin-top: 18px;
+  color: #8cafc3;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.transfer-q1-note-head {
+  display: block;
+  margin-bottom: 0;
+}
+
+.transfer-q1-orange {
+  color: #ff7800;
+}
+
+.transfer-q1-buttons {
+  margin-top: 38px;
+  display: flex;
+  justify-content: center;
+  gap: 76px;
+}
+
+.transfer-q1-btn {
+  width: 83px;
+  height: 43px;
+  background: #ffffff;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.transfer-q1-btn.yes {
+  border: 2px solid rgba(23, 144, 54, 0.7);
+  color: #039929;
+}
+
+.transfer-q1-btn.no {
+  border: 2px solid rgba(255, 0, 4, 0.7);
+  color: rgba(255, 0, 4, 0.7);
+}

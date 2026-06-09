@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.queue-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.queue-card {
+  width: 393px;
+  min-height: 852px;
+  padding-top: 120px;
+  text-align: center;
+}
+
+.queue-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+
+.queue-success-image {
+  width: 220px;
+  height: auto;
+  display: block;
+}
+
+.queue-main-title {
+  color: #4c5d7c;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.45;
+  margin-bottom: 20px;
+}
+
+/* คิวก่อนหน้า */
+.queue-count {
+  color: #4c5d7c;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 60px;
+}
+
+.queue-count span {
+  color: #ff7900;
+}
+
+/* ข้อมูลคิว */
+.queue-info-box {
+  padding: 0 24px;
+}
+
+.queue-info-text {
+  color: #ff7900;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.queue-name-text {
+  color: #ff7900;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.queue-room-text {
+  color: #ff7900;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 393px) {
+  .queue-card {
+    width: 100%;
+    padding: 120px 20px 0;
+  }
+
+  .queue-success-image {
+    width: 200px;
+  }
+
+  .queue-main-title {
+    font-size: 24px;
+  }
+
+  .queue-count {
+    font-size: 22px;
+  }
+
+  .queue-info-text,
+  .queue-name-text,
+  .queue-room-text {
+    font-size: 24px;
+  }
+}

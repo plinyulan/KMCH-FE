@@ -1,0 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.register-success-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.register-success-card {
+  width: 393px;
+  min-height: 852px;
+  background: #ffffff;
+  text-align: center;
+
+  /* ขยับขึ้นจากเดิม */
+  padding: 85px 32px 40px;
+}
+
+.register-success-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 45px;
+}
+
+.register-success-image {
+  width: 210px;
+  height: auto;
+  display: block;
+}
+
+.register-success-title {
+  color: #4c5d7c;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+.register-success-desc {
+  color: #4c5d7c;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+/* ข้อความสีส้ม */
+.register-success-note {
+  color: #ff8d45;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 60px;
+}
+
+.register-success-button {
+  width: 210px;
+  height: 58px;
+  border: none;
+  border-radius: 999px;
+
+  background: #ff8d45;
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 500;
+  font-family: "Noto Sans Thai", sans-serif;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 18px rgba(255, 141, 69, 0.28);
+
+  transition: all 0.2s ease;
+}
+
+.register-success-button:hover {
+  opacity: 0.95;
+}
+
+.register-success-button:active {
+  transform: scale(0.97);
+}
