@@ -10,8 +10,6 @@ function Advices() {
     localStorage.getItem("qa2Answer") === "yes";
 
   const handleFinish = async () => {
-    // Backend-driven: if patient is in the mental-health Excel
-    // (psyeval_form=true), skip the warning even if no local flag was set.
     let psyevalForm = false;
     try {
       const lineId = await getLineId();
@@ -22,14 +20,11 @@ function Advices() {
         psyevalForm = check?.psyeval_form === true;
       }
     } catch {
-      // network error → fall back to localStorage flag
+      // network error → treat as not-in-Excel and show the warning
     }
 
-    const mentalTestDone =
-      psyevalForm || localStorage.getItem("mentalTestDone") === "true";
-
-    if (mentalTestDone) {
-      navigate("/menu");
+    if (psyevalForm) {
+      navigate("/register-success");
     } else {
       navigate("/mental-test-warning");
     }
