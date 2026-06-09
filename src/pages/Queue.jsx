@@ -1,91 +1,185 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./Queue.css";
 import image from "../image/queue.png";
-import { apiGet, getLineId, DEFAULT_EVENT_ID } from "../services/api";
+import { apiGet, apiPost, getLineId, DEFAULT_EVENT_ID } from "../services/api";
+
+const POLL_INTERVAL_MS = 5_000;
 
 function Queue() {
-  const [queueData, setQueueData] = useState({
-    queueCount: 0,
-    queueNo: "-",
-    name: "",
-    room: "",
-    status: "waiting",
-  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Flag set by Scanqrcode when the user scanned the "complete consultation"
+  // QR before actually being seen by a doctor.
+  const fromDoctorScan = location.state?.fromDoctorScan === true;
 
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [ready, setReady] = useState(false);
+  const joinTriedRef = useRef(false);
 
   const fetchQueue = async () => {
     try {
       const lineId = await getLineId();
       if (!lineId) {
-        console.warn("no line id yet — skipping queue fetch");
+        setError("ยังไม่พบ LINE ID");
+        setReady(true);
         return;
       }
-      const data = await apiGet(
-        `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`
+      const resp = await apiGet(
+        `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`,
       );
 
-      setQueueData({
-        queueCount: data.ahead ?? data.total_waiting ?? 0,
-        queueNo: data.queue_no ?? "-",
-        name: data.name ?? "",
-        room: data.room_name ?? "",
-        status: data.status ?? "waiting",
-      });
-    } catch (error) {
-      console.error("โหลดข้อมูลคิวไม่สำเร็จ", error);
-    } finally {
-      setLoading(false);
+      // If not yet in queue (e.g. user landed here via URL QR, not the
+      // QUEUE: prefix branch), try to join once. Backend enforces is_paid.
+      if (
+        resp?.status === "not_in_queue" &&
+        !fromDoctorScan &&
+        !joinTriedRef.current
+      ) {
+        joinTriedRef.current = true;
+        try {
+          await apiPost(
+            `/patients/${encodeURIComponent(lineId)}/scan-doctor-queue`,
+            { event_id: DEFAULT_EVENT_ID },
+          );
+          // Re-fetch status after the join.
+          const after = await apiGet(
+            `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`,
+          );
+          setData(after);
+          setError(null);
+          setReady(true);
+          return;
+        } catch (joinErr) {
+          // Surface the reason (not paid / not registered / etc.) but keep
+          // showing the page so the user isn't stranded.
+          console.warn("auto-join failed:", joinErr?.message);
+        }
+      }
+
+      setData(resp);
+      setError(null);
+      setReady(true);
+    } catch (err) {
+      setError(err?.message || "โหลดข้อมูลคิวไม่สำเร็จ");
+      setReady(true);
     }
   };
 
   useEffect(() => {
     fetchQueue();
-
-    const interval = setInterval(() => {
-      fetchQueue();
-    }, 2 * 60 * 1000);
-
-    return () => clearInterval(interval);
+    const id = setInterval(fetchQueue, POLL_INTERVAL_MS);
+    return () => clearInterval(id);
   }, []);
+
+  // Hide the entire page until the first fetch resolves so the user doesn't
+  // see a flash of the loading state before the real content lands.
+  if (!ready) return null;
+
+  // navigate stays imported in case we add a redirect later; suppress unused
+  // warning while not in use.
+  void navigate;
 
   return (
     <div className="queue-page">
       <div className="queue-card">
         <div className="queue-icon">
-          <img
-            src={image}
-            alt="Queue Success"
-            className="queue-success-image"
-          />
+          <img src={image} alt="Queue" className="queue-success-image" />
         </div>
-
-        <h1 className="queue-main-title">
-          คุณได้เข้าสู่ระบบคิวเรียบร้อยแล้ว
-        </h1>
-
-        <p className="queue-count">
-          ตอนนี้คิวที่รออยู่ก่อนหน้า:{" "}
-          <span>{loading ? "..." : queueData.queueCount}</span> คิว
-        </p>
-
-        {queueData.status === "waiting" && (
-          <div className="queue-info-box">
-            <p className="queue-info-text">
-              คิวของคุณ : {queueData.queueNo}
-            </p>
-
-            <p className="queue-name-text">
-              {queueData.name}
-            </p>
-
-            <p className="queue-room-text">
-              ห้องที่รับบริการคือ {queueData.room}
-            </p>
-          </div>
+        {error ? (
+          <p className="queue-count">{error}</p>
+        ) : (
+          <StatusView data={data} fromDoctorScan={fromDoctorScan} />
         )}
       </div>
     </div>
+  );
+}
+
+function StatusView({ data, fromDoctorScan }) {
+  const status = data?.status;
+
+  // Only show this warning when the user scanned the DOCTOR (complete) QR
+  // before actually being seen by a doctor — not for any plain visit.
+  if (fromDoctorScan && status !== "completed") {
+    return (
+      <>
+        <h1 className="queue-main-title">คุณยังไม่ได้เข้าคิวพบแพทย์</h1>
+        <p className="queue-count">
+          กรุณารอเรียกคิวและพบแพทย์ก่อนสแกน QR Code เสร็จสิ้น
+        </p>
+      </>
+    );
+  }
+
+  if (status === "not_in_queue") {
+    return (
+      <>
+        <h1 className="queue-main-title">ยังไม่ได้เข้าคิว</h1>
+        <p className="queue-count">
+          กรุณาสแกน QR Code ที่จุดบริการเพื่อรับคิวพบแพทย์
+        </p>
+      </>
+    );
+  }
+
+  if (status === "waiting") {
+    return (
+      <>
+        <h1 className="queue-main-title">คุณได้เข้าสู่ระบบคิวเรียบร้อยแล้ว</h1>
+        <p className="queue-count">
+          ตอนนี้คิวที่รออยู่ก่อนหน้า: <span>{data.ahead ?? 0}</span> คิว
+        </p>
+        {typeof data.total_waiting === "number" && (
+          <p className="queue-count">
+            จำนวนคิวทั้งหมด: <span>{data.total_waiting}</span> คิว
+          </p>
+        )}
+      </>
+    );
+  }
+
+  if (status === "assigned") {
+    return (
+      <>
+        <h1 className="queue-main-title">ถึงคิวคุณแล้ว</h1>
+        <p className="queue-count">กรุณาไปที่ห้องตรวจ</p>
+        <div className="queue-info-box">
+          <p className="queue-room-text">
+            ห้องที่รับบริการคือ {data.room_name || "-"}
+          </p>
+        </div>
+      </>
+    );
+  }
+
+  if (status === "completed") {
+    return (
+      <>
+        <h1 className="queue-main-title">พบแพทย์เรียบร้อยแล้ว</h1>
+        <p className="queue-count">
+          กรุณาไปสถานีถัดไป
+          {data.next_station ? `: ${data.next_station}` : ""}
+        </p>
+      </>
+    );
+  }
+
+  if (status === "skip") {
+    return (
+      <>
+        <h1 className="queue-main-title">คิวของคุณถูกข้าม</h1>
+        <p className="queue-count">กรุณาติดต่อเจ้าหน้าที่</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <h1 className="queue-main-title">สถานะคิว</h1>
+      <p className="queue-count">{data?.message || "ไม่ทราบสถานะ"}</p>
+    </>
   );
 }
 

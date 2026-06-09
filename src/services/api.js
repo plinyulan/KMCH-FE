@@ -28,24 +28,23 @@ async function request(path, { method = "GET", body, headers } = {}) {
 export const apiGet = (path) => request(path);
 export const apiPost = (path, body) => request(path, { method: "POST", body });
 
-// LINE user id. Prefer LIFF profile, fall back to a value cached in
-// localStorage so dev outside LINE still works.
+// LINE user id. Prefer the live LIFF profile (and overwrite any cached value)
+// so a stale dev-fallback can't outlive a real LINE login. Falls back to the
+// localStorage value only when LIFF isn't available (e.g. browser dev).
 export async function getLineId() {
-  const cached = localStorage.getItem("lineId");
-  if (cached) return cached;
-
   try {
-    if (!liff.isLoggedIn?.()) return null;
-    const profile = await liff.getProfile();
-    if (profile?.userId) {
-      localStorage.setItem("lineId", profile.userId);
-      return profile.userId;
+    if (liff.isLoggedIn?.()) {
+      const profile = await liff.getProfile();
+      if (profile?.userId) {
+        localStorage.setItem("lineId", profile.userId);
+        return profile.userId;
+      }
     }
   } catch {
-    // LIFF not initialized — caller handles missing line id.
+    // LIFF not initialized — fall through to cached value.
   }
 
-  return null;
+  return localStorage.getItem("lineId");
 }
 
 export function setLineId(lineId) {

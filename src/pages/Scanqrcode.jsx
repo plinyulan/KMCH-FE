@@ -24,12 +24,13 @@ function Scanqrcode() {
     setDebugText(`waiting for LIFF...\n${baseInfo()}`);
 
     const onReady = () => {
-      const info =
-        `LIFF READY\n` +
-        baseInfo() +
-        `\nisInClient: ${liff.isInClient?.() ?? "unknown"}` +
-        `\nscanCodeV2 available: ${liff.isApiAvailable?.("scanCodeV2") ?? "unknown"}`;
-      console.log(info);
+      // const info =
+      //   `LIFF READY\n` +
+      //   baseInfo() +
+      //   `\nisInClient: ${liff.isInClient?.() ?? "unknown"}` +
+      //   `\nscanCodeV2 available: ${liff.isApiAvailable?.("scanCodeV2") ?? "unknown"}`;
+      const info = ``;
+      // console.log(info);
       setDebugText(info);
       setLiffReady(true);
     };
@@ -150,14 +151,23 @@ function Scanqrcode() {
       }
 
       if (type === "CHECKOUT") {
-        await callBackend("scan_after_payment");
-        alert("ชำระเงินสำเร็จ กำลังเปิดเส้นทาง");
-        navigate("/state-path");
+        // Just route to the transfer-confirm question. The page will call
+        // scan-after-payment with the user's answer in one POST.
+        navigate("/transfer-confirm");
         return;
       }
 
       if (type === "DOCTOR") {
-        await callBackend("complete_consultation");
+        try {
+          await callBackend("complete_consultation");
+        } catch (err) {
+          // Backend rejected because the user isn't actually in a doctor room
+          // yet ("no active queue entry" / "patient is not currently assigned
+          // to a room"). Surface the dedicated warning page.
+          console.warn("complete_consultation rejected:", err?.message);
+          navigate("/queue", { state: { fromDoctorScan: true } });
+          return;
+        }
         alert("จบการพบแพทย์ ไปสถานีถัดไป");
         navigate("/finish");
         return;

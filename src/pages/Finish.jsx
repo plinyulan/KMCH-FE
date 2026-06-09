@@ -1,26 +1,35 @@
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Finish.css";
 import successImg from "../image/finish.png";
+import { apiPost, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function Finish() {
   const navigate = useNavigate();
+  const ranRef = useRef(false);
 
-  const handleFinish = async () => {
-    try {
-      // ตัวอย่างเรียก backend เพื่อลบออกจากคิว
-      // await fetch("http://localhost:3000/api/queue/finish", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ userId: localStorage.getItem("userId") }),
-      // });
+  // Fire complete-doctor-consultation as soon as the user lands here, so the
+  // DB status flips even if the Scanqrcode handler skipped the call. Guarded
+  // by ranRef so React StrictMode's double-invoke doesn't fire it twice.
+  useEffect(() => {
+    if (ranRef.current) return;
+    ranRef.current = true;
 
+    (async () => {
+      const lineId = await getLineId();
+      if (!lineId) return;
+      try {
+        await apiPost(
+          `/patients/${encodeURIComponent(lineId)}/complete-doctor-consultation`,
+          { event_id: DEFAULT_EVENT_ID },
+        );
+      } catch (err) {
+        // Already completed or not currently assigned → safe to ignore.
+        console.warn("complete-doctor-consultation on /finish:", err?.message);
+      }
       localStorage.removeItem("queueId");
-
-      navigate("/menu");
-    } catch (error) {
-      console.error("Finish queue error:", error);
-    }
-  };
+    })();
+  }, []);
 
   return (
     <div className="finish-page">
@@ -29,9 +38,7 @@ function Finish() {
 
         <h1 className="finish-title">คุณได้ทำรายการสำเร็จแล้ว</h1>
 
-        <h2 className="finish-next">
-          สถานีต่อไปนี้คือ X-ray
-        </h2>
+        <h2 className="finish-next">สถานีต่อไปนี้คือ X-ray</h2>
 
         <button className="finish-btn" onClick={() => navigate("/")}>
           เสร็จสิ้น
