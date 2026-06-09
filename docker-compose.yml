@@ -10,6 +10,8 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       # Pass FQDN through to the nginx config template.
       FQDN: ${FQDN}
+      # Only substitute FQDN in templates; leave nginx's own $vars alone.
+      NGINX_ENVSUBST_FILTER: "^FQDN$$"
     volumes:
       # Persist certs across container recreations.
       - letsencrypt:/etc/letsencrypt
