@@ -40,9 +40,6 @@ function Finish() {
 
         <h2 className="finish-next">สถานีต่อไปนี้คือ X-ray</h2>
 
-        <button className="finish-btn" onClick={() => navigate("/")}>
-          เสร็จสิ้น
-        </button>
       </div>
     </div>
   );

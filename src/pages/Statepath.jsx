@@ -289,10 +289,7 @@ function StatePath() {
             </div>
           ))}
         </div>
-
-        <button className="finish-btn" onClick={() => navigate("/scan-qr-code")}>
-          เสร็จสิ้น
-        </button>
+        
       </div>
     </div>
   );

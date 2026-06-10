@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.xray-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.xray-card {
+  width: 393px;
+  min-height: 852px;
+  padding-top: 120px;
+  text-align: center;
+}
+
+.xray-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 70px;
+}
+
+.xray-success-image {
+  width: 220px;
+  height: auto;
+  display: block;
+}
+
+.xray-main-title {
+  color: #ff7900;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 100px;
+}
+
+
+.xray-finish-btn:hover {
+  opacity: 0.9;
+}

@@ -10,7 +10,7 @@ import Mentaltestwarning from "./pages/Mentaltestwarning";
 import Tranferconfirm from "./pages/Transferconfirm";
 import Queue from "./pages/Queue";
 import Finish from "./pages/Finish";
-import Scanqrcode from "./pages/Scanqrcode";
+import Xray from "./pages/Xray";
 import Registersuccess from "./pages/Registersuccess";
 import Statepath from "./pages/Statepath";
 
@@ -28,7 +28,7 @@ function App() {
       <Route path="/transfer-confirm" element={<Tranferconfirm />} />
       <Route path="/queue" element={<Queue />} />
       <Route path="/finish" element={<Finish />} />
-      <Route path="/scan-qr-code" element={<Scanqrcode />} />
+      <Route path="/x-ray" element={<Xray />} />
       <Route path="/register-success" element={<Registersuccess />} />
       <Route path="/state-path" element={<Statepath />} />
 

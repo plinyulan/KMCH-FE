@@ -27,12 +27,12 @@ function Register() {
 
     // First Name
     if (!form.firstName.trim()) {
-      newErrors.firstName = "Please enter your First Name";
+      newErrors.firstName = "Please enter your First Name(English only)";
     }
 
     // Last Name
     if (!form.lastName.trim()) {
-      newErrors.lastName = "Please enter your Last Name";
+      newErrors.lastName = "Please enter your Last Name (English only)";
     }
 
     // National ID / Passport
