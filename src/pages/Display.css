@@ -1,0 +1,178 @@
+/* ── TV Display Board — 55-inch, white bg, orange headings ── */
+
+.display-page {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #000000;
+  font-family: "Sarabun", "Noto Sans Thai", sans-serif;
+  padding: 28px 36px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Header ── */
+.display-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  border-bottom: 4px solid #FF8D45;
+  padding-bottom: 16px;
+}
+
+.display-title {
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: #FF8D45;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.display-updated {
+  font-size: 1.1rem;
+  color: #aaaaaa;
+}
+
+/* ── Main 2-column grid ── */
+.display-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.display-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Room card ── */
+.display-room-card {
+  background: #ffffff;
+  border: 2.5px solid #FF8D45;
+  border-radius: 16px;
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Waiting panel same structure */
+.display-waiting-card {
+  background: #fff8f3;
+  border: 2.5px solid #FF8D45;
+  border-radius: 16px;
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Room header row ── */
+.display-room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.display-room-name {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #FF8D45;
+}
+
+.display-room-badge {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 99px;
+}
+
+.display-room-badge.in {
+  background: #FF8D45;
+  color: #ffffff;
+}
+
+.display-room-badge.free {
+  background: #f0f0f0;
+  color: #999999;
+}
+
+.display-waiting-badge {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 99px;
+  background: #FF8D45;
+  color: #ffffff;
+}
+
+/* ── Room body ── */
+.display-room-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.display-room-patient {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: #fff5ed;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.display-room-empty {
+  font-size: 1.2rem;
+  color: #cccccc;
+  font-style: italic;
+}
+
+/* ── Waiting body ── */
+.display-waiting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.display-waiting-patient {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #ffe5cc;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.display-waiting-num {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #FF8D45;
+  min-width: 28px;
+}
+
+/* ── Shared patient info ── */
+.display-patient-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.display-patient-id {
+  font-size: 1rem;
+  color: #888888;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}

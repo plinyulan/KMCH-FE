@@ -30,10 +30,10 @@ function Queue() {
         `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`,
       );
 
-      // If not yet in queue (e.g. user landed here via URL QR, not the
-      // QUEUE: prefix branch), try to join once. Backend enforces is_paid.
+      // Try to join once when status is pending (paid but not queued yet)
+      // or not_in_queue. Backend enforces is_paid and rejects if not paid.
       if (
-        resp?.status === "not_in_queue" &&
+        (resp?.status === "not_in_queue" || resp?.status === "pending") &&
         !fromDoctorScan &&
         !joinTriedRef.current
       ) {

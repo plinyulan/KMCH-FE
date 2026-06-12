@@ -1,4 +1,13 @@
 import { useState } from "react";
+
+function isValidThaiID(id) {
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(id[i]) * (13 - i);
+  }
+  const check = (11 - (sum % 11)) % 10;
+  return check === parseInt(id[12]);
+}
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
 import { apiGet, apiPost, getLineId, setLineId, DEFAULT_EVENT_ID } from "../services/api";
@@ -16,6 +25,46 @@ function Register() {
 
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [walkInMessage, setWalkInMessage] = useState(null);
+  const [pendingLineId, setPendingLineId] = useState(null);
+
+  const proceedAfterRegister = async (lineId) => {
+    // Auto-process payment and determine route
+    try {
+      const resp = await apiPost(`/patients/${encodeURIComponent(lineId)}/scan-after-payment`, {
+        event_id: DEFAULT_EVENT_ID,
+      });
+      if (resp?.route_type) {
+        localStorage.setItem("backendRouteType", resp.route_type);
+      }
+    } catch (err) {
+      const msg = (err?.message || "").toLowerCase();
+      // "already" means it was processed before — still continue
+      if (!msg.includes("already")) {
+        // non-fatal, continue anyway
+      }
+    }
+
+    // Check if mental health screening was completed
+    let psyevalForm = false;
+    try {
+      const check = await apiGet(
+        `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
+      );
+      psyevalForm = check?.psyeval_form === true;
+    } catch {
+      // safe default: show warning
+    }
+
+    const mentalDone = localStorage.getItem("mentalTestDone") === "true";
+    navigate(psyevalForm || mentalDone ? "/register-success" : "/mental-test-warning");
+  };
+
+  const continueAfterWalkIn = async () => {
+    setWalkInMessage(null);
+    const lineId = pendingLineId || await getLineId();
+    await proceedAfterRegister(lineId);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,59 +74,43 @@ function Register() {
     const hasNationalId = form.citizenId.trim() !== "";
     const hasPassportId = form.passportId.trim() !== "";
 
-    // First Name
     if (!form.firstName.trim()) {
       newErrors.firstName = "Please enter your First Name(English only)";
     }
 
-    // Last Name
     if (!form.lastName.trim()) {
       newErrors.lastName = "Please enter your Last Name (English only)";
     }
 
-    // National ID / Passport
     if (!hasNationalId && !hasPassportId) {
-      newErrors.id =
-        "Please enter your National ID or Passport Number";
+      newErrors.id = "Please enter your National ID or Passport Number";
     }
 
     if (hasNationalId && hasPassportId) {
-      newErrors.id =
-        "Please enter only one of the IDs";
+      newErrors.id = "Please enter only one of the IDs";
     }
 
-    // National ID Validation
-    if (hasNationalId && !/^\d{13}$/.test(form.citizenId)) {
-      newErrors.citizenId =
-        "National ID must contain exactly 13 digits";
+    if (hasNationalId) {
+      if (!/^\d{13}$/.test(form.citizenId)) {
+        newErrors.citizenId = "National ID must contain exactly 13 digits";
+      } else if (!isValidThaiID(form.citizenId)) {
+        newErrors.citizenId = "เลขบัตรประชาชนไม่ถูกต้อง";
+      }
     }
 
-    // Passport Validation
-    if (
-      hasPassportId &&
-      !/^[A-Za-z0-9]{6,9}$/.test(form.passportId)
-    ) {
-      newErrors.passportId =
-        "Passport ID must contain 6-9 characters";
+    if (hasPassportId && !/^[A-Za-z0-9]{6,9}$/.test(form.passportId)) {
+      newErrors.passportId = "Passport ID must contain 6-9 characters";
     }
 
-    // Phone Number (Optional)
-    if (
-      form.phone.trim() !== "" &&
-      !/^\d{10}$/.test(form.phone)
-    ) {
-      newErrors.phone =
-        "Phone Number must contain exactly 10 digits";
+    if (form.phone.trim() !== "" && !/^\d{10}$/.test(form.phone)) {
+      newErrors.phone = "Phone Number must contain exactly 10 digits";
     }
 
     setErrors(newErrors);
-
     if (Object.keys(newErrors).length !== 0) return;
 
     const idValue = hasNationalId ? form.citizenId : form.passportId;
 
-    // Outside LINE (web/dev) LIFF isn't initialized, so synthesize a stable
-    // line_id from the user's ID so the backend has something to key on.
     let lineId = await getLineId();
     if (!lineId) {
       lineId = `dev-${idValue}`;
@@ -89,13 +122,16 @@ function Register() {
       first_name: form.firstName.trim(),
       last_name: form.lastName.trim(),
       tel_no: form.phone.trim(),
-      id: idValue,
       event_id: DEFAULT_EVENT_ID,
+      ...(hasNationalId
+        ? { national_id: form.citizenId.trim() }
+        : { passport_id: form.passportId.trim() }),
     };
 
+    let resp;
     try {
       setSubmitting(true);
-      const resp = await apiPost("/register", body);
+      resp = await apiPost("/register", body);
       localStorage.setItem("registerResponse", JSON.stringify(resp));
     } catch (err) {
       setErrors({ submit: err.message || "ลงทะเบียนไม่สำเร็จ" });
@@ -104,27 +140,30 @@ function Register() {
       setSubmitting(false);
     }
 
-    // If the patient is already in the mental-health Excel (psyeval_form=true),
-    // skip the /mental-test-warning page in every branch below.
-    let psyevalForm = false;
-    try {
-      const check = await apiGet(
-        `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
-      );
-      psyevalForm = check?.psyeval_form === true;
-    } catch {
-      // safe default: leave psyevalForm=false so warning still shows
+    // Walk-in: show message, user taps continue then we proceed
+    if (resp?.walk_in) {
+      setPendingLineId(lineId);
+      setWalkInMessage(resp.message);
+      return;
     }
 
-    if (hasNationalId) {
-      navigate("/QA1");
-    } else if (psyevalForm) {
-      navigate("/QA1");
-    } else {
-      const mentalDone = localStorage.getItem("mentalTestDone") === "true";
-      navigate(mentalDone ? "/QA1" : "/mental-test-warning");
-    }
+    await proceedAfterRegister(lineId);
   };
+
+  if (walkInMessage) {
+    return (
+      <div className="register-page">
+        <div className="register-form" style={{ textAlign: "center", gap: 24 }}>
+          <p style={{ fontSize: 20, fontWeight: "bold", color: "#e53e3e" }}>
+            {walkInMessage}
+          </p>
+          <button type="button" onClick={continueAfterWalkIn}>
+            ดำเนินการต่อ
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="register-page">
@@ -180,18 +219,11 @@ function Register() {
             placeholder="National ID (for Thai Students)"
             value={form.citizenId}
             onChange={(e) => {
-              const onlyNumber =
-                e.target.value.replace(/\D/g, "");
-
-              setForm({
-                ...form,
-                citizenId: onlyNumber.slice(0, 13),
-              });
+              const onlyNumber = e.target.value.replace(/\D/g, "");
+              setForm({ ...form, citizenId: onlyNumber.slice(0, 13) });
             }}
           />
-          {errors.citizenId && (
-            <p>{errors.citizenId}</p>
-          )}
+          {errors.citizenId && <p>{errors.citizenId}</p>}
         </div>
 
         {/* Passport ID */}
@@ -202,23 +234,11 @@ function Register() {
             placeholder="Passport ID (for Foreign Students)"
             value={form.passportId}
             onChange={(e) => {
-              const value =
-                e.target.value.replace(
-                  /[^A-Za-z0-9]/g,
-                  ""
-                );
-
-              setForm({
-                ...form,
-                passportId: value.slice(0, 9),
-              });
+              const value = e.target.value.replace(/[^A-Za-z0-9]/g, "");
+              setForm({ ...form, passportId: value.slice(0, 9) });
             }}
           />
-
-          {errors.passportId && (
-            <p>{errors.passportId}</p>
-          )}
-
+          {errors.passportId && <p>{errors.passportId}</p>}
           {errors.id && <p>{errors.id}</p>}
         </div>
 
@@ -230,19 +250,11 @@ function Register() {
             placeholder="Phone Number (Optional)"
             value={form.phone}
             onChange={(e) => {
-              const onlyNumber =
-                e.target.value.replace(/\D/g, "");
-
-              setForm({
-                ...form,
-                phone: onlyNumber.slice(0, 10),
-              });
+              const onlyNumber = e.target.value.replace(/\D/g, "");
+              setForm({ ...form, phone: onlyNumber.slice(0, 10) });
             }}
           />
-
-          {errors.phone && (
-            <p>{errors.phone}</p>
-          )}
+          {errors.phone && <p>{errors.phone}</p>}
         </div>
 
         <button type="submit" disabled={submitting}>

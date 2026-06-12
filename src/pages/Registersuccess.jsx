@@ -6,7 +6,7 @@ function RegisterSuccess() {
   const navigate = useNavigate();
 
   const handleNext = () => {
-    navigate("/");
+    navigate("/state-path");
   };
 
   return (
