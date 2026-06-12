@@ -1,4 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Register.css";
+import {
+  apiGet,
+  apiPost,
+  getLineId,
+  setLineId,
+  DEFAULT_EVENT_ID,
+} from "../services/api";
 
 function isValidThaiID(id) {
   let sum = 0;
@@ -8,9 +17,6 @@ function isValidThaiID(id) {
   const check = (11 - (sum % 11)) % 10;
   return check === parseInt(id[12]);
 }
-import { useNavigate } from "react-router-dom";
-import "./Register.css";
-import { apiGet, apiPost, getLineId, setLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -28,41 +34,43 @@ function Register() {
   const [walkInMessage, setWalkInMessage] = useState(null);
   const [pendingLineId, setPendingLineId] = useState(null);
 
+  const isEnglishOnly = (value) => /^[A-Za-z]+$/.test(value);
+
   const proceedAfterRegister = async (lineId) => {
-    // Auto-process payment and determine route
     try {
-      const resp = await apiPost(`/patients/${encodeURIComponent(lineId)}/scan-after-payment`, {
-        event_id: DEFAULT_EVENT_ID,
-      });
+      const resp = await apiPost(
+        `/patients/${encodeURIComponent(lineId)}/scan-after-payment`,
+        {
+          event_id: DEFAULT_EVENT_ID,
+        },
+      );
+
       if (resp?.route_type) {
         localStorage.setItem("backendRouteType", resp.route_type);
       }
-    } catch (err) {
-      const msg = (err?.message || "").toLowerCase();
-      // "already" means it was processed before — still continue
-      if (!msg.includes("already")) {
-        // non-fatal, continue anyway
-      }
-    }
+    } catch {}
 
-    // Check if mental health screening was completed
     let psyevalForm = false;
+
     try {
       const check = await apiGet(
-        `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
+        `/patients/${encodeURIComponent(
+          lineId,
+        )}/check?event_id=${DEFAULT_EVENT_ID}`,
       );
       psyevalForm = check?.psyeval_form === true;
-    } catch {
-      // safe default: show warning
-    }
+    } catch {}
 
     const mentalDone = localStorage.getItem("mentalTestDone") === "true";
-    navigate(psyevalForm || mentalDone ? "/register-success" : "/mental-test-warning");
+
+    navigate(
+      psyevalForm || mentalDone ? "/register-success" : "/mental-test-warning",
+    );
   };
 
   const continueAfterWalkIn = async () => {
     setWalkInMessage(null);
-    const lineId = pendingLineId || await getLineId();
+    const lineId = pendingLineId || (await getLineId());
     await proceedAfterRegister(lineId);
   };
 
@@ -75,35 +83,40 @@ function Register() {
     const hasPassportId = form.passportId.trim() !== "";
 
     if (!form.firstName.trim()) {
-      newErrors.firstName = "Please enter your First Name(English only)";
+      newErrors.firstName = "Please enter your First Name";
+    } else if (!isEnglishOnly(form.firstName.trim())) {
+      newErrors.firstName = "First Name must be English letters only";
     }
 
     if (!form.lastName.trim()) {
-      newErrors.lastName = "Please enter your Last Name (English only)";
+      newErrors.lastName = "Please enter your Surname";
+    } else if (!isEnglishOnly(form.lastName.trim())) {
+      newErrors.lastName = "Surname must be English letters only";
     }
 
     if (!hasNationalId && !hasPassportId) {
-      newErrors.id = "Please enter your National ID or Passport Number";
+      newErrors.id =
+        "Please fill in either National ID for Thai students or Passport ID for foreign students";
     }
 
     if (hasNationalId && hasPassportId) {
-      newErrors.id = "Please enter only one of the IDs";
+      newErrors.id = "Please fill in only one ID type";
     }
 
     if (hasNationalId) {
       if (!/^\d{13}$/.test(form.citizenId)) {
-        newErrors.citizenId = "National ID must contain exactly 13 digits";
+        newErrors.citizenId = "National ID must be exactly 13 digits";
       } else if (!isValidThaiID(form.citizenId)) {
-        newErrors.citizenId = "เลขบัตรประชาชนไม่ถูกต้อง";
+        newErrors.citizenId = "Invalid National ID";
       }
     }
 
     if (hasPassportId && !/^[A-Za-z0-9]{6,9}$/.test(form.passportId)) {
-      newErrors.passportId = "Passport ID must contain 6-9 characters";
+      newErrors.passportId = "Passport ID must be 6-9 letters or numbers";
     }
 
     if (form.phone.trim() !== "" && !/^\d{10}$/.test(form.phone)) {
-      newErrors.phone = "Phone Number must contain exactly 10 digits";
+      newErrors.phone = "Phone Number must be exactly 10 digits";
     }
 
     setErrors(newErrors);
@@ -112,6 +125,7 @@ function Register() {
     const idValue = hasNationalId ? form.citizenId : form.passportId;
 
     let lineId = await getLineId();
+
     if (!lineId) {
       lineId = `dev-${idValue}`;
       setLineId(lineId);
@@ -129,18 +143,18 @@ function Register() {
     };
 
     let resp;
+
     try {
       setSubmitting(true);
       resp = await apiPost("/register", body);
       localStorage.setItem("registerResponse", JSON.stringify(resp));
     } catch (err) {
-      setErrors({ submit: err.message || "ลงทะเบียนไม่สำเร็จ" });
+      setErrors({ submit: err.message || "Registration failed" });
       return;
     } finally {
       setSubmitting(false);
     }
 
-    // Walk-in: show message, user taps continue then we proceed
     if (resp?.walk_in) {
       setPendingLineId(lineId);
       setWalkInMessage(resp.message);
@@ -153,12 +167,10 @@ function Register() {
   if (walkInMessage) {
     return (
       <div className="register-page">
-        <div className="register-form" style={{ textAlign: "center", gap: 24 }}>
-          <p style={{ fontSize: 20, fontWeight: "bold", color: "#e53e3e" }}>
-            {walkInMessage}
-          </p>
+        <div className="register-form walkin-box">
+          <p className="walkin-message">{walkInMessage}</p>
           <button type="button" onClick={continueAfterWalkIn}>
-            ดำเนินการต่อ
+            Continue
           </button>
         </div>
       </div>
@@ -169,49 +181,33 @@ function Register() {
     <div className="register-page">
       <h1 className="register-title">Register</h1>
 
-      <form
-        className="register-form"
-        onSubmit={handleSubmit}
-      >
-        {/* First Name */}
+      <form className="register-form" onSubmit={handleSubmit}>
         <div>
           <input
             type="text"
             name="firstName"
             placeholder="First Name"
             value={form.firstName}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                firstName: e.target.value,
-              })
-            }
+            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
           />
-          {errors.firstName && (
-            <p>{errors.firstName}</p>
-          )}
+          <p className={errors.firstName ? "error-text" : "help-text"}>
+            {errors.firstName || "Please enter your First Name (English only)"}
+          </p>
         </div>
 
-        {/* Last Name */}
         <div>
           <input
             type="text"
             name="lastName"
-            placeholder="Last Name"
+            placeholder="Surname"
             value={form.lastName}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                lastName: e.target.value,
-              })
-            }
+            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
           />
-          {errors.lastName && (
-            <p>{errors.lastName}</p>
-          )}
+          <p className={errors.lastName ? "error-text" : "help-text"}>
+            {errors.lastName || "Please enter your Surname (English only)"}
+          </p>
         </div>
 
-        {/* National ID */}
         <div>
           <input
             type="text"
@@ -223,10 +219,9 @@ function Register() {
               setForm({ ...form, citizenId: onlyNumber.slice(0, 13) });
             }}
           />
-          {errors.citizenId && <p>{errors.citizenId}</p>}
+          {errors.citizenId && <p className="error-text">{errors.citizenId}</p>}
         </div>
 
-        {/* Passport ID */}
         <div>
           <input
             type="text"
@@ -238,11 +233,18 @@ function Register() {
               setForm({ ...form, passportId: value.slice(0, 9) });
             }}
           />
-          {errors.passportId && <p>{errors.passportId}</p>}
-          {errors.id && <p>{errors.id}</p>}
+
+          <p
+            className={
+              errors.id || errors.passportId ? "error-text" : "help-text"
+            }
+          >
+            {errors.passportId ||
+              errors.id ||
+              "Fill in National ID or Passport ID only one field"}
+          </p>
         </div>
 
-        {/* Phone Number Optional */}
         <div>
           <input
             type="text"
@@ -251,17 +253,23 @@ function Register() {
             value={form.phone}
             onChange={(e) => {
               const onlyNumber = e.target.value.replace(/\D/g, "");
-              setForm({ ...form, phone: onlyNumber.slice(0, 10) });
+              setForm({
+                ...form,
+                phone: onlyNumber.slice(0, 10),
+              });
             }}
           />
-          {errors.phone && <p>{errors.phone}</p>}
+
+          <p className={errors.phone ? "error-text" : "help-text"}>
+            {errors.phone || "Enter a phone number the hospital can contact."}
+          </p>
         </div>
 
         <button type="submit" disabled={submitting}>
           {submitting ? "Submitting..." : "Complete"}
         </button>
 
-        {errors.submit && <p>{errors.submit}</p>}
+        {errors.submit && <p className="error-text">{errors.submit}</p>}
       </form>
     </div>
   );

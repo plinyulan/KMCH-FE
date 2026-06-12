@@ -1,3 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
 .register-page {
   width: 393px;
   min-height: 852px;
@@ -9,21 +15,23 @@
 
 .register-title {
   position: absolute;
-  top: 234px;
+  top: 180px;
   left: 0;
   right: 0;
+  margin: 0;
   text-align: center;
+
   font-size: 24px;
   font-weight: 700;
   color: #ff7800;
-  margin: 0;
 }
 
 .register-form {
   position: absolute;
-  top: 309px;
+  top: 250px;
   left: 35px;
   width: 324px;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -32,13 +40,19 @@
 .register-form input {
   width: 100%;
   height: 42px;
-  box-sizing: border-box;
+
   border: 2px solid rgba(255, 120, 0, 0.3);
   border-radius: 20px;
+
   padding: 0 20px;
-  font-size: 14px;
   outline: none;
-  color: #333;
+
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333333;
+
+  background: #ffffff;
 }
 
 .register-form input::placeholder {
@@ -49,24 +63,67 @@
   border-color: #ff7800;
 }
 
-.register-form p {
-  margin: 5px 0 0 12px;
-  font-size: 11px;
+/* ข้อความอธิบายสีน้ำเงิน */
+.register-form .help-text {
+  margin: 8px 0 0 24px;
+
   color: #405574;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ข้อความ error สีแดง */
+.register-form .error-text {
+  margin: 8px 0 0 24px;
+
+  color: #e53935;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .register-form button {
   width: 101px;
   height: 42px;
+
+  margin: 40px auto 0;
+
   border: none;
   border-radius: 20px;
+
   background: #ff7800;
-  color: white;
+  color: #ffffff;
+
+  font-family: "Noto Sans Thai", sans-serif;
   font-size: 14px;
+  font-weight: 700;
+
   cursor: pointer;
-  margin: 40px auto 0;
+  transition: opacity 0.2s ease;
 }
 
 .register-form button:hover {
   opacity: 0.9;
+}
+
+.register-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Walk-in Message */
+.walkin-box {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: 150px;
+}
+
+.walkin-message {
+  color: #e53935;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 24px;
 }
