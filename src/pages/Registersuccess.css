@@ -20,8 +20,6 @@
   min-height: 852px;
   background: #ffffff;
   text-align: center;
-
-  /* ขยับขึ้นจากเดิม */
   padding: 85px 32px 40px;
 }
 
@@ -38,11 +36,24 @@
 }
 
 .register-success-title {
-  color: #ff8d45;
-  font-size: 32px;
+  color: #4c5d7c;
+  font-size: 30px;
   font-weight: 600;
   line-height: 1.4;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
+}
+
+.register-success-subtitle {
+  color: #ff8d45;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 28px;
+
+  text-decoration: underline;
+  text-decoration-color: #ff8d45;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 7px;
 }
 
 .register-success-desc {
@@ -50,16 +61,7 @@
   font-size: 18px;
   font-weight: 500;
   line-height: 1.55;
-  margin-bottom: 20px;
-}
-
-/* ข้อความสีส้ม */
-.register-success-note {
-  color: #ff8d45;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.6;
-  margin-bottom: 60px;
+  margin-bottom: 45px;
 }
 
 .register-success-button {
@@ -67,18 +69,13 @@
   height: 58px;
   border: none;
   border-radius: 999px;
-
   background: #ff8d45;
   color: #ffffff;
-
   font-size: 22px;
   font-weight: 500;
   font-family: "Noto Sans Thai", sans-serif;
-
   cursor: pointer;
-
   box-shadow: 0 8px 18px rgba(255, 141, 69, 0.28);
-
   transition: all 0.2s ease;
 }
 

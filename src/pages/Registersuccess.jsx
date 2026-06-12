@@ -13,25 +13,23 @@ function RegisterSuccess() {
     <div className="register-success-page">
       <div className="register-success-card">
         <div className="register-success-icon">
-          <img
-            src={checked}
-            alt="success"
-            className="register-success-image"
-          />
+          <img src={checked} alt="success" className="register-success-image" />
         </div>
 
         <h1 className="register-success-title">
-          ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว 
+          ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว
         </h1>
 
+        <h2 className="register-success-subtitle">
+          กรุณาเดินไปที่จุดลงทะเบียน
+        </h2>
+
         <p className="register-success-desc">
-          ขอบคุณที่เป็นเพื่อนกับเรา เราจะส่งข่าวสารผ่านบัญชีไลน์ของคุณเป็นระยะ ๆ เพื่ออัปเดตข้อมูลและแจ้งเตือนต่าง ๆ
+          ขอบคุณที่เป็นเพื่อนกับเรา เราจะส่งข่าวสารผ่านบัญชีไลน์ของคุณเป็นระยะ ๆ
+          เพื่ออัปเดตข้อมูลและแจ้งเตือนต่าง ๆ
         </p>
 
-        <button
-          className="register-success-button"
-          onClick={handleNext}
-        >
+        <button className="register-success-button" onClick={handleNext}>
           ถัดไป
         </button>
       </div>
