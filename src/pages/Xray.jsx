@@ -4,7 +4,6 @@ import "./Xray.css";
 import successImg from "../image/final.png";
 
 function Xray() {
-  const navigate = useNavigate();
   const ranRef = useRef(false);
 
   useEffect(() => {
