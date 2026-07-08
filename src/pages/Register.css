@@ -112,6 +112,14 @@
   cursor: not-allowed;
 }
 
+.or-divider {
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+  font-weight: 500;
+  margin: -8px 0;
+}
+
 /* Walk-in Message */
 .walkin-box {
   justify-content: center;
@@ -120,10 +128,16 @@
   padding-top: 150px;
 }
 
+.walkin-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #FF8D45;
+  margin-bottom: 16px;
+}
+
 .walkin-message {
-  color: #e53935;
+  color: #333333;
   font-size: 20px;
-  font-weight: 700;
-  line-height: 1.5;
-  margin-bottom: 24px;
+  font-weight: 600;
+  line-height: 1.7;
 }

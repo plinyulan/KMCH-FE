@@ -1,4 +1,4 @@
-import "./MentalTestWarning.css";
+import "./Mentaltestwarning.css";
 import { useNavigate } from "react-router-dom";
 
 function MentalTestWarning() {

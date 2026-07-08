@@ -4,14 +4,33 @@ import { apiGet } from "../services/api";
 
 const POLL_MS = 5000;
 
+function getDisplayName(roomName) {
+  const match = roomName?.match(/(\d+)/);
+  return match ? `Exam.${String(match[1]).padStart(2, "0")}` : roomName;
+}
+
+function getRoomLabel(roomName) {
+  const match = roomName?.match(/(\d+)/);
+  return match ? `ห้องตรวจ${String(match[1]).padStart(2, "0")}` : roomName;
+}
+
+function formatPatient(p) {
+  const lastName = (p.last_name ?? "").slice(0, 2);
+  return {
+    name: `${p.first_name} ${lastName}`,
+    id: `xxxx-${p.masked_id}`,
+  };
+}
+
 function RoomCard({ room }) {
   const patients = room.patients ?? [];
+  const displayName = getDisplayName(room.room_name);
   return (
     <div className="display-room-card">
       <div className="display-room-header">
-        <span className="display-room-name">{room.room_name}</span>
+        <span className="display-room-name">{getRoomLabel(room.room_name)}</span>
         <span className={`display-room-badge ${patients.length > 0 ? "in" : "free"}`}>
-          {patients.length > 0 ? "กำลังพบแพทย์" : "ว่าง"}
+          {displayName}
         </span>
       </div>
       <div className="display-room-body">
@@ -20,10 +39,8 @@ function RoomCard({ room }) {
         ) : (
           patients.map((p, i) => (
             <div key={i} className="display-room-patient">
-              <span className="display-patient-name">
-                {p.first_name} {p.last_name}
-              </span>
-              <span className="display-patient-id">xxxx-{p.masked_id}</span>
+              <span className="display-patient-name">{formatPatient(p).name}</span>
+              <span className="display-patient-id">{formatPatient(p).id}</span>
             </div>
           ))
         )}
@@ -47,10 +64,8 @@ function WaitingPanel({ patients }) {
         ) : (
           patients.map((p, i) => (
             <div key={i} className="display-waiting-patient">
-              <span className="display-patient-name">
-                {p.first_name} {p.last_name}
-              </span>
-              <span className="display-patient-id">xxxx-{p.masked_id}</span>
+              <span className="display-patient-name">{formatPatient(p).name}</span>
+              <span className="display-patient-id">{formatPatient(p).id}</span>
             </div>
           ))
         )}
@@ -61,13 +76,11 @@ function WaitingPanel({ patients }) {
 
 function Display() {
   const [data, setData] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
       const resp = await apiGet("/display");
       setData(resp);
-      setLastUpdate(new Date());
     } catch {
       // keep old data on error
     }
@@ -82,35 +95,24 @@ function Display() {
   const rooms = data?.rooms ?? [];
   const waiting = data?.waiting ?? [];
 
-  const left = rooms.slice(0, 3);   // Room 1, 2, 3
-  const right = rooms.slice(3, 5);  // Room 4, 5
-
   return (
     <div className="display-page">
-      {/* Header */}
-      <div className="display-header">
-        <h1 className="display-title">QUEUE FOR DOCTOR</h1>
-        {lastUpdate && (
-          <span className="display-updated">
-            อัปเดต {lastUpdate.toLocaleTimeString("th-TH")}
-          </span>
-        )}
-      </div>
-
-      {/* 6-section grid: left 3 rooms | right 2 rooms + waiting */}
+      {/* Left: rooms | Right: waiting queue */}
       <div className="display-grid">
         {/* Left column */}
         <div className="display-col">
-          {left.map((room) => (
+          <h2 className="display-section-title">ไปนั่งรอด้านในหน้าห้องตรวจ</h2>
+          {rooms.map((room) => (
             <RoomCard key={room.room_id} room={room} />
           ))}
         </div>
 
+        {/* Center divider */}
+        <div className="display-divider" />
+
         {/* Right column */}
         <div className="display-col">
-          {right.map((room) => (
-            <RoomCard key={room.room_id} room={room} />
-          ))}
+          <h2 className="display-section-title display-section-title--blue">นั่งรอคิวเรียกบนหน้าจอ</h2>
           <WaitingPanel patients={waiting} />
         </div>
       </div>

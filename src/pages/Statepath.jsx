@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Statepath.css";
 
 import studentImg from "../image/Student.png";
@@ -8,40 +6,11 @@ import qrImg from "../image/qrcode.png";
 import doctorImg from "../image/seedoctor.png";
 import mentalImg from "../image/mantal.png";
 import xrayImg from "../image/x-ray.png";
-import { apiGet, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 
 function StatePath() {
-  const navigate = useNavigate();
-
-  const [needsMental, setNeedsMental] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const lineId = await getLineId();
-      if (!lineId) return;
-      try {
-        const data = await apiGet(
-          `/patients/${encodeURIComponent(lineId)}/check?event_id=${DEFAULT_EVENT_ID}`
-        );
-        if (!cancelled && data?.psyeval_form === false) {
-          setNeedsMental(true);
-        }
-      } catch {
-        // not registered / network error — leave needsMental as false
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  // backendRouteType is the authoritative source (A or C)
+  // backendRouteType set by scan-after-payment: C or D = needs psychologist
   const backendRouteType = localStorage.getItem("backendRouteType");
-  let pathType = "NORMAL";
-  if (backendRouteType === "C") {
-    pathType = "MENTAL";
-  } else if (!backendRouteType && needsMental) {
-    pathType = "MENTAL";
-  }
+  const pathType = (backendRouteType === "C" || backendRouteType === "D") ? "MENTAL" : "NORMAL";
 
   const pathMap = {
     NORMAL: [
@@ -62,12 +31,14 @@ function StatePath() {
         color: "blue",
         img: doctorImg,
         desc: "พบแพทย์เพื่อตรวจคัดกรองสุขภาพเบื้องต้น ณ OPD 1",
+        stationNumber: 4,
       },
       {
         title: "X-ray",
         color: "orange",
         img: xrayImg,
         desc: "เอ็กซ์เรย์ทรวงอก ณ ชั้น B (ลงบันไดเลื่อน)",
+        stationNumber: 5,
       },
     ],
 
@@ -133,7 +104,7 @@ function StatePath() {
             <div className={`station station-${index + 1}`} key={index}>
               <img src={item.img} alt="" className="station-img" />
               <div className="station-text">
-                <h3>สถานีที่ {index + 1}:</h3>
+                <h3>สถานีที่ {item.stationNumber ?? (index + 1)}:</h3>
                 <h4 className={item.color}>
                   {item.title.split("\n").map((line, i) => (
                     <span key={i}>{line}<br /></span>
@@ -149,5 +120,4 @@ function StatePath() {
   );
 }
 
-void useNavigate;
 export default StatePath;

@@ -30,8 +30,7 @@ function Queue() {
         `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`,
       );
 
-      // Try to join once when status is pending (paid but not queued yet)
-      // or not_in_queue. Backend enforces is_paid and rejects if not paid.
+      // Auto-join queue if not yet in it
       if (
         (resp?.status === "not_in_queue" || resp?.status === "pending") &&
         !fromDoctorScan &&
@@ -43,7 +42,6 @@ function Queue() {
             `/patients/${encodeURIComponent(lineId)}/scan-doctor-queue`,
             { event_id: DEFAULT_EVENT_ID },
           );
-          // Re-fetch status after the join.
           const after = await apiGet(
             `/patients/${encodeURIComponent(lineId)}/queue-status?event_id=${DEFAULT_EVENT_ID}`,
           );
@@ -52,8 +50,6 @@ function Queue() {
           setReady(true);
           return;
         } catch (joinErr) {
-          // Surface the reason (not paid / not registered / etc.) but keep
-          // showing the page so the user isn't stranded.
           console.warn("auto-join failed:", joinErr?.message);
         }
       }
@@ -124,10 +120,20 @@ function StatusView({ data, fromDoctorScan }) {
     );
   }
 
+  if (status === "pending") {
+    return (
+      <>
+        <h1 className="queue-main-title">กำลังเข้าสู่ระบบคิว...</h1>
+        <p className="queue-count">กรุณารอสักครู่</p>
+      </>
+    );
+  }
+
   if (status === "waiting") {
     return (
       <>
         <h1 className="queue-main-title">คุณได้เข้าสู่ระบบคิวเรียบร้อยแล้ว</h1>
+        <p className="queue-count">ไปวัดความดันก่อนเข้าพบแพทย์</p>
         <p className="queue-count">
           ตอนนี้คิวที่รออยู่ก่อนหน้า: <span>{data.ahead ?? 0}</span> คิว
         </p>

@@ -36,9 +36,9 @@ function Finish() {
       <div className="finish-card">
         <img src={successImg} alt="success" className="finish-img" />
 
-        <h1 className="finish-title">คุณได้ทำรายการสำเร็จแล้ว</h1>
+        <h1 className="finish-title">คุณพบแพทย์เสร็จแล้ว</h1>
 
-        <h2 className="finish-next">สถานีต่อไปนี้คือ X-ray</h2>
+        <h2 className="finish-next">สถานีต่อไปคือ สถานีที่ 5 X-RAY</h2>
 
       </div>
     </div>
