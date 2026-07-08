@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { apiPost, getLineId, DEFAULT_EVENT_ID } from "../services/api";
 import "./Xray.css";
 import successImg from "../image/final.png";
@@ -24,10 +23,6 @@ function Xray() {
       }
     })();
   }, []);
-
-  const handleFinish = () => {
-    navigate("/finish");
-  };
 
   return (
     <div className="xray-page">
