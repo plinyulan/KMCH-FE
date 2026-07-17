@@ -1,0 +1,249 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap");
+
+.register-vaccine-page,
+.register-vaccine-page * {
+    box-sizing: border-box;
+}
+
+.register-vaccine-page {
+    width: 100%;
+    max-width: 393px;
+    min-height: 100vh;
+
+    margin: 0 auto;
+    padding: 48px 24px 40px;
+
+    background: #ffffff;
+
+    font-family: "Noto Sans Thai", sans-serif;
+}
+
+.register-vaccine-content {
+    width: 100%;
+
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.register-vaccine-title {
+    margin: 0 0 10px;
+
+    color: #405574;
+
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.register-vaccine-description {
+    margin: 0 0 36px;
+
+    color: #747b85;
+
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.65;
+    text-align: center;
+}
+
+.register-vaccine-form {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+}
+
+.register-vaccine-form-group {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.register-vaccine-form-group label {
+    margin-bottom: 9px;
+
+    color: #405574;
+
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.register-vaccine-form-group input {
+    width: 100%;
+    height: 56px;
+
+    padding: 0 18px;
+
+    color: #405574;
+    background: #ffffff;
+
+    border: 1.5px solid #d9d9d9;
+    border-radius: 42px;
+
+    outline: none;
+
+    font-family: "Noto Sans Thai", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.register-vaccine-form-group input::placeholder {
+    color: #ababab;
+
+    font-family: "Noto Sans Thai", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.register-vaccine-form-group input:hover {
+    border-color: #bfc4cb;
+}
+
+.register-vaccine-form-group input:focus {
+    border-color: #ff7800;
+    background: #fffdf9;
+
+    box-shadow: 0 0 0 3px rgba(255, 120, 0, 0.13);
+}
+
+.register-vaccine-form-group input.input-error {
+    border-color: #d94b4b;
+    background: #fffafa;
+}
+
+.register-vaccine-form-group input.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(217, 75, 75, 0.12);
+}
+
+.register-vaccine-error {
+    margin: 6px 0 0;
+
+    color: #d94b4b;
+
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.register-vaccine-button {
+    width: 50%;
+    height: 44px;
+
+    margin: 16px auto 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #ffffff;
+    background: #ff7800;
+
+    border: none;
+    border-radius: 999px;
+
+    font-family: "Noto Sans Thai", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 14px rgba(255, 120, 0, 0.16);
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.register-vaccine-button:hover {
+    background: #ed7000;
+
+    box-shadow: 0 7px 16px rgba(255, 120, 0, 0.2);
+}
+
+.register-vaccine-button:active {
+    transform: scale(0.97);
+}
+
+.register-vaccine-button:focus-visible {
+    outline: 3px solid rgba(255, 120, 0, 0.25);
+    outline-offset: 3px;
+}
+
+.register-vaccine-button:disabled {
+    background: #d9d9d9;
+    color: #ffffff;
+
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (max-width: 393px) {
+    .register-vaccine-page {
+        padding: 38px 20px 34px;
+    }
+
+    .register-vaccine-top-line {
+        margin-bottom: 20px;
+    }
+
+    .register-vaccine-title {
+        font-size: 27px;
+    }
+
+    .register-vaccine-description {
+        margin-bottom: 30px;
+
+        font-size: 14px;
+    }
+
+    .register-vaccine-form {
+        gap: 21px;
+    }
+
+    .register-vaccine-form-group label {
+        font-size: 15px;
+    }
+
+    .register-vaccine-form-group input {
+        height: 54px;
+
+        border-radius: 20px;
+    }
+
+    .register-vaccine-button {
+        width: 72%;
+        height: 43px;
+
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 340px) {
+    .register-vaccine-page {
+        padding: 32px 16px;
+    }
+
+    .register-vaccine-title {
+        font-size: 25px;
+    }
+
+    .register-vaccine-form-group input {
+        padding: 0 15px;
+    }
+
+    .register-vaccine-button {
+        width: 72%;
+    }
+}

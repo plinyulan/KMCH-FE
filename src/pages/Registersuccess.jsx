@@ -6,7 +6,7 @@ function RegisterSuccess() {
   const navigate = useNavigate();
 
   const handleNext = () => {
-    navigate("/state-path");
+    //navigate("/state-path");
   };
 
   return (
@@ -20,18 +20,18 @@ function RegisterSuccess() {
           ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว
         </h1>
 
-        <h2 className="register-success-subtitle">
+        {/* <h2 className="register-success-subtitle">
           กรุณาเดินไปที่จุดลงทะเบียน
-        </h2>
+        </h2> */}
 
         <p className="register-success-desc">
           ขอบคุณที่เป็นเพื่อนกับเรา เราจะส่งข่าวสารผ่านบัญชีไลน์ของคุณเป็นระยะ ๆ
           เพื่ออัปเดตข้อมูลและแจ้งเตือนต่าง ๆ
         </p>
 
-        <button className="register-success-button" onClick={handleNext}>
+        {/* <button className="register-success-button" onClick={handleNext}>
           ถัดไป
-        </button>
+        </button> */}
       </div>
     </div>
   );

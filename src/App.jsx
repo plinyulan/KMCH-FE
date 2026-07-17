@@ -11,6 +11,10 @@ import Statepath from "./pages/Statepath";
 import CompleteDoctor from "./pages/CompleteDoctor";
 import Display from "./pages/Display";
 import ManualQueue from "./pages/ManualQueue";
+import RegisterVaccine from "./pages/RegisterVaccine";
+import RegisterCompany from "./pages/RegisterCompany";
+import Menulist from "./pages/Menulist";
+import CheckVaccine from "./pages/CheckVaccine";
 
 function App() {
   return (
@@ -26,6 +30,10 @@ function App() {
       <Route path="/complete-doctor" element={<CompleteDoctor />} />
       <Route path="/display" element={<Display />} />
       <Route path="/manual-queue" element={<ManualQueue />} />
+      <Route path="/register-vaccine" element={<RegisterVaccine />} />
+      <Route path="/register-company" element={<RegisterCompany />} />
+      <Route path="/menu-list" element={<Menulist />} />
+      <Route path="/check-vaccine" element={<CheckVaccine />} />
     </Routes>
   );
 }

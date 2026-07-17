@@ -7,8 +7,8 @@
 }
 
 .register-success-page {
-  width: 100%;
-  min-height: 100vh;
+  width: 393px;
+  min-height: 852px;
   background: #ffffff;
   display: flex;
   justify-content: center;
@@ -57,7 +57,7 @@
 }
 
 .register-success-desc {
-  color: #4c5d7c;
+  color: #ff8d45;
   font-size: 18px;
   font-weight: 500;
   line-height: 1.55;

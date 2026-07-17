@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.check-vaccine-page {
+  width: 393px;
+  min-height: 852px;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.check-vaccine-card {
+  width: 393px;
+  min-height: 852px;
+  padding: 80px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.check-vaccine-title {
+  margin-top: 180px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #f58220;
+  text-align: center;
+}
+
+.check-vaccine-description {
+  margin-top: 42px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #55627d;
+  text-align: center;
+}
+
+.check-vaccine-link {
+  margin-top: 44px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f58220;
+  text-decoration: underline;
+  word-break: break-word;
+  text-align: center;
+}
+
+.check-vaccine-link.disabled {
+  cursor: default;
+}
+
+.check-vaccine-button {
+  margin-top: 95px;
+  width: 150px;
+  height: 56px;
+  border: none;
+  border-radius: 999px;
+  background: #f58220;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.check-vaccine-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(245, 130, 32, 0.28);
+}
+
+.check-vaccine-button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 430px) {
+  .check-vaccine-card {
+    width: 100%;
+    min-height: 100vh;
+    padding: 70px 28px 40px;
+  }
+
+  .check-vaccine-title {
+    font-size: 30px;
+    margin-top: 180px;
+  }
+
+  .check-vaccine-description,
+  .check-vaccine-link {
+    font-size: 17px;
+  }
+
+  .check-vaccine-button {
+    width: 220px;
+    height: 70px;
+    font-size: 20px;
+  }
+}
