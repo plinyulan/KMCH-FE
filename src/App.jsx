@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 
-import Menu from "./pages/Menu";
 import Register from "./pages/Register";
 import Mentaltestwarning from "./pages/Mentaltestwarning";
 import Queue from "./pages/Queue";
@@ -19,7 +18,7 @@ import CheckVaccine from "./pages/CheckVaccine";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Menu />} />
+      <Route path="/" element={<Menulist />} />
       <Route path="/register" element={<Register />} />
       <Route path="/mental-test-warning" element={<Mentaltestwarning />} />
       <Route path="/queue" element={<Queue />} />

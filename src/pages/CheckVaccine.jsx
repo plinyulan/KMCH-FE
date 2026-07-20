@@ -1,14 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import "./CheckVaccine.css";
 
 export default function CheckVaccine() {
-  const navigate = useNavigate();
-
   const vaccineLink = "http://mobile.kmch.kmitl.ac.th/vaccine/#/vaccine/form";
-
-  const handleNext = () => {
-    navigate("/register-success");
-  };
 
   return (
     <div className="check-vaccine-page">
@@ -20,31 +13,44 @@ export default function CheckVaccine() {
         </h1>
 
         <p className="check-vaccine-description">
-          กรุณากรอกข้อมูลของท่าน
+          กรุณาเปิดเว็บไซต์เพื่อกรอกข้อมูลประวัติวัคซีน
           <br />
-          ผ่านเว็บไซต์ด้านล่างนี้
+          ก่อนดำเนินการต่อ
         </p>
 
         <a
-          href={vaccineLink || "#"}
+          href={vaccineLink}
           target="_blank"
           rel="noopener noreferrer"
           className="check-vaccine-link"
-          onClick={(e) => {
-            if (!vaccineLink) {
-              e.preventDefault();
-            }
-          }}
         >
-          {vaccineLink || "เว็บไซต์กรอกข้อมูลประวัติวัคซีน"}
-        </a>
+          <div className="link-content">
+            <span className="link-title">
+              เว็บไซต์กรอกข้อมูลประวัติวัคซีน
+            </span>
 
-        <button
-          className="check-vaccine-button"
-          onClick={handleNext}
-        >
-          ถัดไป
-        </button>
+            <span className="link-subtitle">
+              กดปุ่มนี้เพื่อเปิดเว็บไซต์
+            </span>
+          </div>
+
+          <span className="link-arrow">
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="link-arrow-icon"
+            >
+              <path
+                d="M9 6L15 12L9 18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </a>
       </div>
     </div>
   );
