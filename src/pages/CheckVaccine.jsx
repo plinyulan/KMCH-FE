@@ -1,8 +1,6 @@
 import "./CheckVaccine.css";
 
 export default function CheckVaccine() {
-  const vaccineLink = "http://mobile.kmch.kmitl.ac.th/vaccine/#/vaccine/form";
-
   return (
     <div className="check-vaccine-page">
       <div className="check-vaccine-card">
@@ -13,43 +11,18 @@ export default function CheckVaccine() {
         </h1>
 
         <p className="check-vaccine-description">
-          กรุณาเปิดเว็บไซต์เพื่อกรอกข้อมูลประวัติวัคซีน
+          กรุณากรอกข้อมูลใบคัดกรองวัคซีนไข้ใหญ่
           <br />
-          ก่อนดำเนินการต่อ
+          ก่อนดำเนินการลงทะเบียน
         </p>
 
         <a
-          href={vaccineLink}
+          href="http://mobile.kmch.kmitl.ac.th/vaccine/#/vaccine/form"
           target="_blank"
           rel="noopener noreferrer"
           className="check-vaccine-link"
         >
-          <div className="link-content">
-            <span className="link-title">
-              เว็บไซต์กรอกข้อมูลประวัติวัคซีน
-            </span>
-
-            <span className="link-subtitle">
-              กดปุ่มนี้เพื่อเปิดเว็บไซต์
-            </span>
-          </div>
-
-          <span className="link-arrow">
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="link-arrow-icon"
-            >
-              <path
-                d="M9 6L15 12L9 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+            กรอกข้อมูลประวัติวัคซีนไข้หวัดใหญ่
         </a>
       </div>
     </div>
